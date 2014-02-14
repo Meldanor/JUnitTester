@@ -1,23 +1,20 @@
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
-
 
 public class ClassFileReaderTest {
 
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
+    @Test
+    public void testFileFromStream() {
+        CompleteFileReader cReader = new CompleteFileReader();
+        assertNotNull(cReader);
 
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception {
-	}
-
-	@Test
-	public void test() {
-		CompleteFileReader cReader = new CompleteFileReader();
-	}
+        String s = cReader.readFile(getClass().getResourceAsStream("/Counter.java"));
+        assertNotNull(s);
+        assertFalse(s.isEmpty());
+        assertTrue(s.contains("public class Counter"));
+    }
 
 }
