@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URI;
+import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,7 +24,16 @@ public class CacheCompiler {
             throw new RuntimeException("Can't find java compiler. Is JDK installed?");
         }
 
-        cReader = new CompleteFileReader();
+        this.cReader = new CompleteFileReader();
+    }
+
+    public Class<?> loadClass(String fileName) throws FileNotFoundException {
+        String content = cReader.readFile(fileName);
+        return loadClass(fileName, content);
+    }
+
+    public Class<?> loadClass(File file) throws FileNotFoundException {
+        return loadClass(file.getName());
     }
 
     public Class<?> loadClass(String className, String classContent) {
@@ -46,31 +56,22 @@ public class CacheCompiler {
 
         if (result) {
             try {
+                // Load the class using url loader
+                URLClassLoader urlClassLoader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
+
+                // Delete possible / and the ending .java from the class path
                 className = className.substring(className.lastIndexOf('/') + 1);
                 className = className.replaceAll(".java", "");
-                return Class.forName(className);
+                // Load the class
+                return urlClassLoader.loadClass(className);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
                 return null;
             }
-
-        }
-
-        else {
+        } else {
             System.out.println(sBuilder);
-
             return null;
         }
-    }
-
-    public Class<?> loadClass(String fileName) throws FileNotFoundException {
-        String content = cReader.readFile(fileName);
-
-        return loadClass(fileName, content);
-    }
-
-    public Class<?> loadClass(File file) throws FileNotFoundException {
-        return loadClass(file.getName());
     }
 
     /**
