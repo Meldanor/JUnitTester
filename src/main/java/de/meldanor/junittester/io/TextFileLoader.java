@@ -1,3 +1,4 @@
+package de.meldanor.junittester.io;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,15 +7,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
-public class CompleteFileReader {
+public class TextFileLoader {
 
     private Charset charset;
 
-    public CompleteFileReader() {
+    public TextFileLoader() {
         this("UTF-8");
     }
 
-    public CompleteFileReader(String charset) {
+    public TextFileLoader(String charset) {
         this.charset = Charset.forName(charset);
     }
 

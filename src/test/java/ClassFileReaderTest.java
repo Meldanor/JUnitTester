@@ -4,11 +4,13 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import de.meldanor.junittester.io.TextFileLoader;
+
 public class ClassFileReaderTest {
 
     @Test
     public void testFileFromStream() {
-        CompleteFileReader cReader = new CompleteFileReader();
+        TextFileLoader cReader = new TextFileLoader();
         assertNotNull(cReader);
 
         String s = cReader.readFile(getClass().getResourceAsStream("/MyCounter.java"));

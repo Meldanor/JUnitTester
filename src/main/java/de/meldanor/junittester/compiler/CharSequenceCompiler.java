@@ -1,3 +1,4 @@
+package de.meldanor.junittester.compiler;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -26,6 +27,8 @@ import javax.tools.JavaFileObject.Kind;
 import javax.tools.SimpleJavaFileObject;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
+
+import de.meldanor.junittester.io.TextFileLoader;
 
 /**
  * Source: http://www.ibm.com/developerworks/library/j-jcomp/
@@ -122,7 +125,7 @@ public class CharSequenceCompiler<T> {
     }
 
     public Class<T> compileJavaFile(File file) throws FileNotFoundException, ClassCastException, CharSequenceCompilerException {
-        CompleteFileReader cReader = new CompleteFileReader();
+        TextFileLoader cReader = new TextFileLoader();
         String javaSource = cReader.readFile(file);
         String fileName = file.getName();
 
@@ -139,7 +142,7 @@ public class CharSequenceCompiler<T> {
     }
 
     public Class<T> compileJavaFile(String className, InputStream source) throws ClassCastException, CharSequenceCompilerException {
-        CompleteFileReader cReader = new CompleteFileReader();
+        TextFileLoader cReader = new TextFileLoader();
         String javaSource = cReader.readFile(source);
         return compile(className, javaSource);
     }
@@ -280,21 +283,6 @@ public class CharSequenceCompiler<T> {
             }
         return newClass;
     }
-
-//    /**
-//     * COnverts a String to a URI.
-//     * 
-//     * @param name
-//     *            a file name
-//     * @return a URI
-//     */
-//    static URI toURI(String name) {
-//        try {
-//            return new URI(name);
-//        } catch (URISyntaxException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
 
     /**
      * @return This compiler's class loader.

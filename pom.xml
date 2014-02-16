@@ -60,7 +60,7 @@
 						</manifestEntries>
 						<manifest>
 							<addClasspath>true</addClasspath>
-							<mainClass>Core</mainClass>
+							<mainClass>de.meldanor.junittester.Core</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

@@ -1,5 +1,8 @@
+package de.meldanor.junittester;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
+
+import de.meldanor.junittester.compiler.CharSequenceCompiler;
 
 public class Core {
 

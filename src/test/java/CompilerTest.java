@@ -7,6 +7,10 @@ import java.lang.reflect.Method;
 
 import org.junit.Test;
 
+import de.meldanor.junittester.compiler.CharSequenceCompiler;
+import de.meldanor.junittester.compiler.CharSequenceCompilerException;
+import de.meldanor.junittester.io.TextFileLoader;
+
 public class CompilerTest {
 
     @Test
@@ -14,7 +18,7 @@ public class CompilerTest {
         CharSequenceCompiler<Object> t = new CharSequenceCompiler<Object>();
         assertNotNull(t);
 
-        Class<?> clazz = t.compileJavaFile("MyCounter", getClass().getResourceAsStream("/MyCounter"));
+        Class<?> clazz = t.compileJavaFile("MyCounter", getClass().getResourceAsStream("/MyCounter.java"));
         assertNotNull(clazz);
         assertEquals("MyCounter", clazz.getName());
 
@@ -38,8 +42,8 @@ public class CompilerTest {
         CharSequenceCompiler<Object> t = new CharSequenceCompiler<Object>();
         assertNotNull(t);
 
-        CompleteFileReader c = new CompleteFileReader();
-        String javaSource = c.readFile(getClass().getResourceAsStream("/MyBuilder"));
+        TextFileLoader c = new TextFileLoader();
+        String javaSource = c.readFile(getClass().getResourceAsStream("/MyBuilder.java"));
         Class<?> clazz = t.compile("MyBuilder", javaSource);
 
         assertNotNull(clazz);

@@ -4,6 +4,9 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
 
+import de.meldanor.junittester.compiler.CharSequenceCompiler;
+import de.meldanor.junittester.compiler.CharSequenceCompilerException;
+
 public class JUnitTest {
 
     @Test
