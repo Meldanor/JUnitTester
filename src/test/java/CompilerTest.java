@@ -1,32 +1,22 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.junit.AfterClass;
 import org.junit.Test;
 
 public class CompilerTest {
 
-    @AfterClass
-    public static void afterClass() {
-        File f = new File("Counter.class");
-        f.delete();
-        f.deleteOnExit();
-    }
-
     @Test
-    public void test() throws FileNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
-        CacheCompiler c = new CacheCompiler();
-        assertNotNull(c);
+    public void counterClassTest() throws ClassCastException, CharSequenceCompilerException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        CharSequenceCompiler<Object> t = new CharSequenceCompiler<Object>();
+        assertNotNull(t);
 
-        Class<?> clazz = c.loadClass("src/test/resources/Counter.java");
+        Class<?> clazz = t.compileJavaFile("MyCounter", getClass().getResourceAsStream("/MyCounter"));
         assertNotNull(clazz);
-        assertEquals("Counter", clazz.getName());
+        assertEquals("MyCounter", clazz.getName());
 
         Constructor<?> standardConstructor = clazz.getConstructor();
         assertNotNull(standardConstructor);
@@ -42,4 +32,30 @@ public class CompilerTest {
         assertEquals("Counter: 2", toStringMethod.invoke(counterObject));
     }
 
+    @Test
+    public void builderClassTest() throws ClassCastException, CharSequenceCompilerException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+
+        CharSequenceCompiler<Object> t = new CharSequenceCompiler<Object>();
+        assertNotNull(t);
+
+        CompleteFileReader c = new CompleteFileReader();
+        String javaSource = c.readFile(getClass().getResourceAsStream("/MyBuilder"));
+        Class<?> clazz = t.compile("MyBuilder", javaSource);
+
+        assertNotNull(clazz);
+        assertEquals("MyBuilder", clazz.getName());
+
+        Constructor<?> standardConstructor = clazz.getConstructor();
+        assertNotNull(standardConstructor);
+
+        Object builderObject = standardConstructor.newInstance();
+        assertNotNull(builderObject);
+
+        Method appendMethod = clazz.getMethod("append", String.class);
+        appendMethod.invoke(builderObject, "Hello ");
+        appendMethod.invoke(builderObject, "World");
+
+        Method toStringMethod = clazz.getMethod("toString");
+        assertEquals("Hello World", toStringMethod.invoke(builderObject));
+    }
 }

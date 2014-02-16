@@ -1,8 +1,8 @@
-public class Counter {
+public class MyCounter {
 
 	private int counter;
 
-	public Counter() {
+	public MyCounter() {
 
 	}
 
