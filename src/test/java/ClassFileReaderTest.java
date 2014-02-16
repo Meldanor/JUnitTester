@@ -11,10 +11,10 @@ public class ClassFileReaderTest {
         CompleteFileReader cReader = new CompleteFileReader();
         assertNotNull(cReader);
 
-        String s = cReader.readFile(getClass().getResourceAsStream("/Counter.java"));
+        String s = cReader.readFile(getClass().getResourceAsStream("/MyCounter.java"));
         assertNotNull(s);
         assertFalse(s.isEmpty());
-        assertTrue(s.contains("public class Counter"));
+        assertTrue(s.contains("public class MyCounter"));
     }
 
 }
