@@ -2,6 +2,12 @@ package de.meldanor.junittester.testing;
 
 import java.util.regex.Pattern;
 
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+
+import de.meldanor.junittester.compiler.CharSequenceCompiler;
+import de.meldanor.junittester.compiler.CharSequenceCompilerException;
+
 public class JUnitTest {
 
     private String content;
@@ -25,6 +31,15 @@ public class JUnitTest {
         return content.toString();
     }
 
+    public <T> Class<T> compile(CharSequenceCompiler<T> compiler) throws ClassCastException, CharSequenceCompilerException {
+        return compiler.compile(className, content);
+    }
+    
+    public <T> Result runTest(CharSequenceCompiler<T> compiler) throws ClassCastException, CharSequenceCompilerException {
+        Class<T> compiledClass = compile(compiler);
+        return JUnitCore.runClasses(compiledClass);
+    }
+
     public static JUnitTestBuilder create(String className, String content) {
         return new JUnitTestBuilder(className, content);
     }
@@ -40,7 +55,7 @@ public class JUnitTest {
             this.product = new JUnitTest(className, content);
         }
 
-        public JUnitTestBuilder replaceClassTag(String className) {
+        public JUnitTestBuilder setClassTag(String className) {
             this.product.content = CLASS_TAG_PATTERN.matcher(this.product.getContent()).replaceAll(className);
             return this;
         }

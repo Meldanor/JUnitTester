@@ -1,5 +1,6 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.regex.Pattern;
 
@@ -11,7 +12,6 @@ import de.meldanor.junittester.compiler.CharSequenceCompiler;
 import de.meldanor.junittester.compiler.CharSequenceCompilerException;
 import de.meldanor.junittester.io.TextFileLoader;
 import de.meldanor.junittester.testing.JUnitTest;
-import de.meldanor.junittester.testing.JUnitTest.JUnitTestBuilder;
 
 public class TestingTests {
 
@@ -37,16 +37,12 @@ public class TestingTests {
         String content = loader.readFile(getClass().getResourceAsStream("/TestCounterPattern.java"));
         assertNotNull(content);
 
-        // Create builder
-        JUnitTestBuilder builder = JUnitTest.create("TestCounter", content);
-        // Set the correct class name
-        JUnitTest test = builder.replaceClassTag("MyCounter").build();
-        // Compile new generated file
-        Class<Object> testClass = com.compile(test.getClassName(), test.getContent());
+        JUnitTest unitTest = JUnitTest.create("TestCounter", content).setClassTag("MyCounter").build();
+        assertNotNull(unitTest);
+        Result testResult = unitTest.runTest(com);
+        assertNotNull(testResult);
 
-        assertNotNull(testClass);
-
-        assertEquals(0, JUnitCore.runClasses(testClass).getFailureCount());
+        assertEquals(0, testResult.getFailureCount());
     }
 
     @Test(expected = CharSequenceCompilerException.class)
@@ -60,16 +56,10 @@ public class TestingTests {
         String content = loader.readFile(getClass().getResourceAsStream("/TestCounterPattern.java"));
         assertNotNull(content);
 
-        // Create builder
-        JUnitTestBuilder builder = JUnitTest.create("TestCounter", content);
-        // Set the wrong class name
-        JUnitTest test = builder.replaceClassTag("MyBuilder").build();
-        // Compile new generated file
-        Class<Object> testClass = com.compile(test.getClassName(), test.getContent());
-
-        assertNotNull(testClass);
-
-        assertEquals(0, JUnitCore.runClasses(testClass).getFailureCount());
+        // Create test suite with unit class name
+        JUnitTest test = JUnitTest.create("TestCounter", content).setClassTag("MyBuilder").build();
+        // Here comes the exception
+        test.compile(com);
     }
 
     @Test(timeout = 2000)
@@ -83,16 +73,13 @@ public class TestingTests {
         String content = loader.readFile(getClass().getResourceAsStream("/TestCounterPattern.java"));
         assertNotNull(content);
 
-        // Create builder
-        JUnitTestBuilder builder = JUnitTest.create("TestCounter", content);
         int timeout = 500;
-        // Set the wrong class name and add a timeout limit of 500 seconds
-        JUnitTest test = builder.replaceClassTag("EndlessMyCounter").setTimeOut(timeout).build();
-        // Compile new generated file
-        Class<Object> testClass = com.compile(test.getClassName(), test.getContent());
 
-        assertNotNull(testClass);
-        Result result = JUnitCore.runClasses(testClass);
+        JUnitTest test = JUnitTest.create("TestCounter", content).setClassTag("EndlessMyCounter").setTimeOut(timeout).build();
+        assertNotNull(test);
+        assertTrue(test.getContent().contains("@Test(timeout = 500)"));
+        Result result = test.runTest(com);
+        assertNotNull(result);
         assertEquals("test(TestCounter): test timed out after " + timeout + " milliseconds", result.getFailures().get(0).toString());
     }
 
@@ -102,7 +89,7 @@ public class TestingTests {
         TextFileLoader loader = new TextFileLoader();
         String unitTestSource = loader.readFile(getClass().getResourceAsStream("/TestCounterPattern.java"));
         String correctSource = loader.readFile(getClass().getResourceAsStream("/MyCounter.java"));
-        JUnitTest unitTest = JUnitTest.create("TestCounter", unitTestSource).replaceClassTag("MyCounter").build();
+        JUnitTest unitTest = JUnitTest.create("TestCounter", unitTestSource).setClassTag("MyCounter").build();
 
         // Correct class compiling and testing
 
@@ -111,10 +98,9 @@ public class TestingTests {
         CharSequenceCompiler<Object> com = new CharSequenceCompiler<Object>();
         Class<Object> correctClass = com.compile("MyCounter", correctSource);
         assertNotNull(correctClass);
-        // Compile with correct source
-        Class<Object> correcttestClass = com.compile(unitTest.getClassName(), unitTest.getContent());
-        // Run correc test
-        Result result = JUnitCore.runClasses(correcttestClass);
+
+        Result result = unitTest.runTest(com);
+        assertNotNull(result);
         assertEquals(0, result.getFailureCount());
 
         // Unload the current compiled classes
@@ -128,9 +114,8 @@ public class TestingTests {
         String wrongSource = correctSource.replaceAll(Pattern.quote("++counter"), "--counter");
         Class<Object> wrongClass = com.compile("MyCounter", wrongSource);
         assertNotNull(wrongClass);
-        Class<Object> wrongTestClass = com.compile(unitTest.getClassName(), unitTest.getContent());
 
-        result = JUnitCore.runClasses(wrongTestClass);
+        result = unitTest.runTest(com);
         assertEquals(1, result.getFailureCount());
         assertEquals("test(TestCounter): expected:<Counter: []2> but was:<Counter: [-]2>", result.getFailures().get(0).toString());
     }
