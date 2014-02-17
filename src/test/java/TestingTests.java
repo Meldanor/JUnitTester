@@ -77,7 +77,7 @@ public class TestingTests {
 
         JUnitTest test = JUnitTest.create("TestCounter", content).setClassTag("EndlessMyCounter").setTimeOut(timeout).build();
         assertNotNull(test);
-        assertTrue(test.getContent().contains("@Test(timeout = 500)"));
+        assertTrue("JUnitTest doesn't have the Rule for timeout!", test.getContent().contains("@Rule\npublic Timeout globalTimeout = new Timeout(500);"));
         Result result = test.runTest(com);
         assertNotNull(result);
         assertEquals("test(TestCounter): test timed out after " + timeout + " milliseconds", result.getFailures().get(0).toString());

@@ -1,5 +1,6 @@
 package de.meldanor.junittester.testing;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.junit.runner.JUnitCore;
@@ -34,7 +35,7 @@ public class JUnitTest {
     public <T> Class<T> compile(CharSequenceCompiler<T> compiler) throws ClassCastException, CharSequenceCompilerException {
         return compiler.compile(className, content);
     }
-    
+
     public <T> Result runTest(CharSequenceCompiler<T> compiler) throws ClassCastException, CharSequenceCompilerException {
         Class<T> compiledClass = compile(compiler);
         return JUnitCore.runClasses(compiledClass);
@@ -49,7 +50,6 @@ public class JUnitTest {
         private JUnitTest product;
 
         private final static Pattern CLASS_TAG_PATTERN = Pattern.compile(Pattern.quote("${CLASS}"));
-        private final static Pattern TEST_TAG_PATTERN = Pattern.compile(Pattern.quote("@Test"));
 
         private JUnitTestBuilder(String className, String content) {
             this.product = new JUnitTest(className, content);
@@ -61,12 +61,46 @@ public class JUnitTest {
         }
 
         public JUnitTestBuilder setTimeOut(int timeout) {
-            this.product.content = TEST_TAG_PATTERN.matcher(this.product.getContent()).replaceAll("@Test(timeout = " + timeout + ")");
+            organizeImports("org.junit.Rule", "org.junit.rules.Timeout");
+
+            int index = this.product.content.indexOf('{') + 1;
+            StringBuilder sBuilder = new StringBuilder(this.product.content);
+            sBuilder.insert(index, "\n\n@Rule\npublic Timeout globalTimeout = new Timeout(" + timeout + ");");
+            this.product.content = sBuilder.toString();
             return this;
         }
-
         public JUnitTest build() {
             return this.product;
+        }
+
+        private void organizeImports(String... imports) {
+            for (int i = 0; i < imports.length; ++i) {
+                String string = imports[i];
+
+                // The unit class has already the import
+                if (this.product.content.contains(string))
+                    continue;
+
+                String lineSeparator = System.lineSeparator();
+                string = "import " + string + ";" + lineSeparator;
+
+                // add the import
+                StringBuilder sBuilder = new StringBuilder(this.product.content);
+                int start = importIndex();
+                sBuilder.insert(start, string);
+                this.product.content = sBuilder.toString();
+            }
+        }
+
+        private final static Pattern PACKAGE_PATTERN = Pattern.compile("package\\s+([a-zA_Z_][\\.\\w]*);");
+
+        private int importIndex() {
+
+            Matcher matcher = PACKAGE_PATTERN.matcher(this.product.content);
+            if (matcher.find())
+                return matcher.end();
+            else
+                return 0;
         }
 
     }
