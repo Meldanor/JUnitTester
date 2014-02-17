@@ -1,6 +1,8 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.regex.Pattern;
+
 import org.junit.Test;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
@@ -92,5 +94,44 @@ public class TestingTests {
         assertNotNull(testClass);
         Result result = JUnitCore.runClasses(testClass);
         assertEquals("test(TestCounter): test timed out after " + timeout + " milliseconds", result.getFailures().get(0).toString());
+    }
+
+    @Test
+    public void sameClassnamesDifferentImplementation() throws ClassCastException, CharSequenceCompilerException {
+
+        TextFileLoader loader = new TextFileLoader();
+        String unitTestSource = loader.readFile(getClass().getResourceAsStream("/TestCounterPattern.java"));
+        String correctSource = loader.readFile(getClass().getResourceAsStream("/MyCounter.java"));
+        JUnitTest unitTest = JUnitTest.create("TestCounter", unitTestSource).replaceClassTag("MyCounter").build();
+
+        // Correct class compiling and testing
+
+        // Load correct working source
+        // Compile sources
+        CharSequenceCompiler<Object> com = new CharSequenceCompiler<Object>();
+        Class<Object> correctClass = com.compile("MyCounter", correctSource);
+        assertNotNull(correctClass);
+        // Compile with correct source
+        Class<Object> correcttestClass = com.compile(unitTest.getClassName(), unitTest.getContent());
+        // Run correc test
+        Result result = JUnitCore.runClasses(correcttestClass);
+        assertEquals(0, result.getFailureCount());
+
+        // Unload the current compiled classes
+        com = null;
+        System.gc();
+
+        // Test wrong class after compiling and testing correctly
+
+        com = new CharSequenceCompiler<Object>();
+        // Modify to be wrong
+        String wrongSource = correctSource.replaceAll(Pattern.quote("++counter"), "--counter");
+        Class<Object> wrongClass = com.compile("MyCounter", wrongSource);
+        assertNotNull(wrongClass);
+        Class<Object> wrongTestClass = com.compile(unitTest.getClassName(), unitTest.getContent());
+
+        result = JUnitCore.runClasses(wrongTestClass);
+        assertEquals(1, result.getFailureCount());
+        assertEquals("test(TestCounter): expected:<Counter: []2> but was:<Counter: [-]2>", result.getFailures().get(0).toString());
     }
 }
