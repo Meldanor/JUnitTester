@@ -1,4 +1,4 @@
-package de.meldanor.junittester.check;
+package de.meldanor.junittester.validate;
 
 import java.util.ArrayList;
 import java.util.List;

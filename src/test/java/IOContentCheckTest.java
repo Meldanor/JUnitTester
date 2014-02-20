@@ -6,10 +6,10 @@ import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.meldanor.junittester.check.ContentValidateEngine.ContentValidatorResult;
-import de.meldanor.junittester.check.ContentValidator;
-import de.meldanor.junittester.check.IOContentValidator;
 import de.meldanor.junittester.io.TextFileLoader;
+import de.meldanor.junittester.validate.ContentValidator;
+import de.meldanor.junittester.validate.IOContentValidator;
+import de.meldanor.junittester.validate.ContentValidateEngine.ContentValidatorResult;
 
 public class IOContentCheckTest {
 

@@ -1,6 +1,6 @@
-package de.meldanor.junittester.check;
+package de.meldanor.junittester.validate;
 
-import de.meldanor.junittester.check.ContentValidateEngine.ContentValidatorResult;
+import de.meldanor.junittester.validate.ContentValidateEngine.ContentValidatorResult;
 
 public class NetworkingContentValidator implements ContentValidator {
 
