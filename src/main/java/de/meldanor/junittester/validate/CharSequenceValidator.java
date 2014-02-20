@@ -2,8 +2,6 @@ package de.meldanor.junittester.validate;
 
 import java.util.Arrays;
 
-import de.meldanor.junittester.validate.ContentValidateEngine.ContentValidatorResult;
-
 public class CharSequenceValidator implements ContentValidator {
 
     private String[] forbiddenString;

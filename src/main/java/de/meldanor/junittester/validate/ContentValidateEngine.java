@@ -3,6 +3,8 @@ package de.meldanor.junittester.validate;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.meldanor.junittester.validate.ContentValidator.ContentValidatorResult;
+
 public class ContentValidateEngine {
 
     private List<ContentValidator> contentCheckerList;
@@ -34,32 +36,6 @@ public class ContentValidateEngine {
         }
 
         return result;
-    }
-
-    public static class ContentValidatorResult {
-
-        private final String reason;
-
-        public ContentValidatorResult() {
-            this.reason = null;
-        }
-
-        public ContentValidatorResult(String reason) {
-            this.reason = reason;
-        }
-
-        public String getReason() {
-            return reason;
-        }
-
-        public boolean isValid() {
-            return reason == null;
-        }
-
-        @Override
-        public String toString() {
-            return "ContentValidatorResult={isValid: " + isValid() + ";reason = " + reason + "}";
-        }
     }
 
 }

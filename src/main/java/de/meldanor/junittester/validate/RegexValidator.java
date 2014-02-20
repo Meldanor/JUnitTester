@@ -2,8 +2,6 @@ package de.meldanor.junittester.validate;
 
 import java.util.regex.Pattern;
 
-import de.meldanor.junittester.validate.ContentValidateEngine.ContentValidatorResult;
-
 public class RegexValidator implements ContentValidator {
 
     private final Pattern pattern;

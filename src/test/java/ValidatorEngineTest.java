@@ -9,7 +9,7 @@ import org.junit.Test;
 import de.meldanor.junittester.io.TextFileLoader;
 import de.meldanor.junittester.validate.CharSequenceValidator;
 import de.meldanor.junittester.validate.ContentValidateEngine;
-import de.meldanor.junittester.validate.ContentValidateEngine.ContentValidatorResult;
+import de.meldanor.junittester.validate.ContentValidator.ContentValidatorResult;
 
 public class ValidatorEngineTest {
 
