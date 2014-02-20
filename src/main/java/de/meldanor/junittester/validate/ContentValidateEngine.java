@@ -29,6 +29,8 @@ public class ContentValidateEngine {
 
         for (ContentValidator cChecker : contentCheckerList) {
             result = cChecker.validateCode(sourceCode);
+            if (!result.isValid())
+                break;
         }
 
         return result;
