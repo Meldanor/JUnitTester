@@ -7,9 +7,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.meldanor.junittester.io.TextFileLoader;
-import de.meldanor.junittester.validate.ContentValidator;
-import de.meldanor.junittester.validate.NetworkingContentValidator;
+import de.meldanor.junittester.validate.CharSequenceValidator;
 import de.meldanor.junittester.validate.ContentValidateEngine.ContentValidatorResult;
+import de.meldanor.junittester.validate.ContentValidator;
 
 public class NetworkingContentCheckTest {
 
@@ -22,7 +22,7 @@ public class NetworkingContentCheckTest {
         TextFileLoader loader = new TextFileLoader();
         maliciousSourceCode = loader.readFile(NetworkingContentCheckTest.class.getResourceAsStream("/NetworkingClass.java"));
         valideSourceCode = loader.readFile(NetworkingContentCheckTest.class.getResourceAsStream("/MyBuilder.java"));
-        validator = new NetworkingContentValidator();
+        validator = new CharSequenceValidator("java.net", "javax.net");
     }
 
     @Test
@@ -30,11 +30,11 @@ public class NetworkingContentCheckTest {
 
         ContentValidatorResult result = validator.validateCode("import java.net");
         assertFalse(result.isValid());
-        assertEquals("package java.net is not allowed", result.getReason());
+        assertEquals("Code can not use java.net", result.getReason());
 
         result = validator.validateCode("import javax.net");
         assertFalse(result.isValid());
-        assertEquals("package javax.net is not allowed", result.getReason());
+        assertEquals("Code can not use javax.net", result.getReason());
 
         result = validator.validateCode("import java.lang");
         assertTrue(result.isValid());
@@ -46,7 +46,7 @@ public class NetworkingContentCheckTest {
 
         ContentValidatorResult result = validator.validateCode(maliciousSourceCode);
         assertFalse(result.isValid());
-        assertEquals("package java.net is not allowed", result.getReason());
+        assertEquals("Code can not use java.net", result.getReason());
     }
 
     @Test

@@ -7,9 +7,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import de.meldanor.junittester.io.TextFileLoader;
-import de.meldanor.junittester.validate.ContentValidator;
-import de.meldanor.junittester.validate.IOContentValidator;
+import de.meldanor.junittester.validate.CharSequenceValidator;
 import de.meldanor.junittester.validate.ContentValidateEngine.ContentValidatorResult;
+import de.meldanor.junittester.validate.ContentValidator;
 
 public class IOContentCheckTest {
 
@@ -22,7 +22,7 @@ public class IOContentCheckTest {
         TextFileLoader loader = new TextFileLoader();
         maliciousSourceCode = loader.readFile(IOContentCheckTest.class.getResourceAsStream("/DeleteFile.java"));
         valideSourceCode = loader.readFile(IOContentCheckTest.class.getResourceAsStream("/MyBuilder.java"));
-        validator = new IOContentValidator();
+        validator = new CharSequenceValidator("java.io", "java.nio");
     }
 
     @Test
@@ -30,11 +30,11 @@ public class IOContentCheckTest {
 
         ContentValidatorResult result = validator.validateCode("import java.io");
         assertFalse(result.isValid());
-        assertEquals("package java.io is not allowed", result.getReason());
+        assertEquals("Code can not use java.io", result.getReason());
 
         result = validator.validateCode("import java.nio");
         assertFalse(result.isValid());
-        assertEquals("package java.nio is not allowed", result.getReason());
+        assertEquals("Code can not use java.nio", result.getReason());
 
         result = validator.validateCode("import java.lang");
         assertTrue(result.isValid());
@@ -46,7 +46,7 @@ public class IOContentCheckTest {
 
         ContentValidatorResult result = validator.validateCode(maliciousSourceCode);
         assertFalse(result.isValid());
-        assertEquals("package java.io is not allowed", result.getReason());
+        assertEquals("Code can not use java.io", result.getReason());
     }
 
     @Test
