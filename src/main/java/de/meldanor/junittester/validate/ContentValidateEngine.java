@@ -16,7 +16,7 @@ public class ContentValidateEngine {
         return this;
     }
 
-    public ContentValidatorResult isValid(String sourceCode) {
+    public ContentValidatorResult validate(String sourceCode) {
         if (contentCheckerList.isEmpty()) {
             return new ContentValidatorResult();
         }
