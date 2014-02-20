@@ -1,9 +1,13 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -61,5 +65,40 @@ public class CompilerTest {
 
         Method toStringMethod = clazz.getMethod("toString");
         assertEquals("Hello World", toStringMethod.invoke(builderObject));
+    }
+
+    @Test
+    public void multipleClassTest() throws CharSequenceCompilerException, InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
+
+        // Simple interface with one method
+        String s = "public interface MyPredicate {  public boolean accept(int i);   }";
+        // Implementation for even numbers
+        String s2 = "public class EvenPredicate implements MyPredicate { public boolean accept(int i) { return i%2==0;}}";
+
+        Map<String, CharSequence> classesToCompile = new LinkedHashMap<String, CharSequence>();
+
+        // put them in wrong order
+        classesToCompile.put("EvenPredicate", s2);
+        classesToCompile.put("MyPredicate", s);
+
+        // Compile them
+        CharSequenceCompiler<Object> compiler = new CharSequenceCompiler<Object>();
+        Map<String, Class<Object>> compileClasses = compiler.compile(classesToCompile);
+
+        // Invoke accept method
+        Class<Object> implementationClass = compileClasses.get("EvenPredicate");
+        Object object = implementationClass.newInstance();
+        Method method = implementationClass.getMethod("accept", int.class);
+        boolean res = (Boolean) method.invoke(object, 2);
+        assertTrue(res);
+
+        Class<Object> interfaceClass = compileClasses.get("MyPredicate");
+
+        try {
+            interfaceClass.newInstance();
+            fail("Can't instantiate an interface!");
+        } catch (InstantiationException e) {
+
+        }
     }
 }
