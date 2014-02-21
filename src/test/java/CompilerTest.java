@@ -101,4 +101,31 @@ public class CompilerTest {
 
         }
     }
+
+    @Test
+    public void packageCompilingTest() throws CharSequenceCompilerException, InstantiationException, IllegalAccessException, NoSuchMethodException, SecurityException, IllegalArgumentException, InvocationTargetException {
+        CharSequenceCompiler<Object> compiler = new CharSequenceCompiler<Object>();
+        TextFileLoader loader = new TextFileLoader();
+        Map<String, CharSequence> classesToCompile = new LinkedHashMap<String, CharSequence>();
+
+        String utilSource = loader.readFile(getClass().getResourceAsStream("/util/Util.java"));
+
+        String helloSource = loader.readFile(getClass().getResourceAsStream("/HelloWorld.java"));
+        // Use not qualified class names
+        classesToCompile.put("Util", utilSource);
+        classesToCompile.put("HelloWorld", helloSource);
+        Map<String, Class<Object>> compileClasses = null;;
+
+        try {
+            compileClasses = compiler.compile(classesToCompile);
+        } catch (CharSequenceCompilerException e) {
+            e.printStackTrace();
+            System.out.println(e.getDiagnostics().getDiagnostics());;
+        }
+
+        Class<Object> helloWorldClass = compileClasses.get("HelloWorld");
+        Object helloWorldObject = helloWorldClass.newInstance();
+        Method sayHi = helloWorldClass.getMethod("sayHi");
+        assertEquals("Hello World", sayHi.invoke(helloWorldObject).toString());
+    }
 }
